@@ -1,13 +1,16 @@
 """
 Discovery mode is connecting to the data source and collecting information that is required for running the tap.
 """
+import sys
 from typing import List, Dict
 
-from singer import metadata
+from singer import get_logger, metadata
 from tap_s3_csv import s3
 
+LOGGER = get_logger('tap_s3_csv')
 
-def discover_streams(config: Dict)-> List[Dict]:
+
+def discover_streams(config: Dict) -> List[Dict]:
     """
     Run discovery mode for every stream in the tap configuration
     :param config: connection and streams configuration
@@ -36,13 +39,16 @@ def discover_schema(config: Dict, table_spec: Dict) -> Dict:
 
     # Raise an exception if schema cannot sampled. Empty schema will fail and target side anyways
     if not sampled_schema:
-        raise ValueError(f"{table_spec.get('search_prefix', '')} - {table_spec.get('search_pattern', '')}"
-            "file(s) has no data and cannot analyse the content to generate the required schema.")
+        # raise FileNotFoundError(f"{table_spec.get('search_prefix', '')} - {table_spec.get('search_pattern', '')}"
+        #     "file(s) has no data and cannot analyse the content to generate the required schema.")
+        LOGGER.info(f"{table_spec.get('search_prefix', '')} - {table_spec.get('search_pattern', '')} - "
+                    "No new file(s)/data, not generating a schema. Ignore any later failures on catalog discovery.")
+        sys.exit(0)
 
     return sampled_schema
 
 
-def load_metadata(table_spec: Dict, schema: Dict)-> List:
+def load_metadata(table_spec: Dict, schema: Dict) -> List:
     """
     Creates metadata for the given stream using its specs and schema
     :param table_spec: stream/table specs
