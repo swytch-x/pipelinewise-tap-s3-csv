@@ -182,7 +182,7 @@ def sample_file(config: Dict, table_spec: Dict, s3_path: str, sample_rate: int) 
 
 # pylint: disable=too-many-arguments
 def sample_files(config: Dict, table_spec: Dict, s3_files: Generator,
-                 sample_rate: int = 5, max_records: int = 1000, max_files: int = 5) -> Generator:
+                 sample_rate: int = 5, max_records: int = 1000, max_files: int = 100) -> Generator:
     """
     Get samples from all files
     :param config:
